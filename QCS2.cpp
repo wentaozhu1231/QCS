@@ -1,5 +1,4 @@
 // wentao zhu 1/17/2021
-#if 0
 #include <iostream>
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
@@ -14,8 +13,8 @@ using namespace std;
 int main(int argc, char* argv[]) {
   try {
     const std::string file_path =
-        "F:\\QC_data\\RI.1.3.46.423632.131000.1606838764.9.dcm";
-       // "C:\\RI.1.2.246.352.81.3.3417524247.25685.18122.148.193--500mu.dcm";
+         //"F:\\QC_data\\RI.1.3.46.423632.131000.1606838764.9.dcm";
+        "C:\\RI.1.2.246.352.81.3.3417524247.25685.18122.148.193--500mu.dcm";
     if (file_path.length() == 0) exit(EXIT_FAILURE);
 
     DicomImage dcm_image(file_path.c_str());
@@ -64,63 +63,33 @@ int main(int argc, char* argv[]) {
     cv::Mat src_8U(int(dcm_image.getHeight()), int(dcm_image.getWidth()),
                    CV_8UC1, (Uint8*)dcm_image.getOutputData(8));
 
-    // cv::Mat src_gray;
-    // cv::Mat detected_edges;
-    // int lowThreshold = 0;
-    // const int max_lowThreshold = 200;
-    // const int ratio = 3;
-    // const int kernel_size = 3;
-    // const char* window_name = "Edge Map";
-    // cv::Canny(src_8U, detected_edges, lowThreshold, lowThreshold * 2.0,
-    //  kernel_size);
+    cv::Mat binary;
+
+    double T =
+        threshold(src_8U, binary, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    cout << "threshold : %.2f\n" << T << endl;
+    cv::imshow("binary", binary);
 
     cv::Mat grad_x, grad_y;
     cv::Mat abs_grad_x, abs_grad_y, dst;
-
-
-    Sobel(src_8U, grad_x, CV_16S, 1, 0, 3, 1, 1, cv::BORDER_DEFAULT);
+    Sobel(binary, grad_x, CV_16S, 1, 0, 3, 1, 1, cv::BORDER_DEFAULT);
     convertScaleAbs(grad_x, abs_grad_x);
-    // imshow("x axis soble", abs_grad_x);
-
-    
-    Sobel(src_8U, grad_y, CV_16S, 0, 1, 3, 1, 1, cv::BORDER_DEFAULT);
+    Sobel(binary, grad_y, CV_16S, 0, 1, 3, 1, 1, cv::BORDER_DEFAULT);
     convertScaleAbs(grad_y, abs_grad_y);
-    // imshow("y axis soble", abs_grad_y);
-
-   
     addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, dst);
-
-    // cv::Mat gray, dst, abs_dst;
-    //
-    ////cv::GaussianBlur(src_8U, src_8U, cv::Size(3, 3), 0, 0,
-    /// cv::BORDER_DEFAULT);
-
-    ////cvtColor(src_8U, gray, cv::COLOR_RGB2GRAY);
-
-    //// The third parameter: the depth of the target image; the fourth
-    /// parameter: / the filter aperture size; the fifth parameter: the scale
-    /// factor; the
-    /// sixth / parameter: the result is stored in the target image
-    // Laplacian(src_8U, dst, CV_16S, 3, 1, 0, cv::BORDER_DEFAULT);
-    //
-    // convertScaleAbs(dst, abs_dst);
-
-    // get the middle axis
-    // first start from the center of the original graph,two gray lines
-
-    /* get the index and find the center
-     I will use template to merge later
-     this row((rows / 2)-1) is the true center line.*/
+    // I don't need sobel any more.
+    cv::imshow("sobel", dst);
 
     vector<int> vRows;
     abs_grad_x.row(cols / 2).copyTo(vRows);
     vector<int> vRowsIndex;
 
     // here, the logic could be wrong
-
-
+    // I don't know whether this is a good way to filter those strange line
     for (auto it = vRows.begin(); it != vRows.end(); ++it) {
-      if (*it >= 10 && *it <= 100) {
+      if ((*it ==255) && (it > vRows.begin() + 20))
+      // if (*it >= 10 && *it <= 100)
+      {
         // subVRowsScale.push_back(*it);
         vRowsIndex.push_back(it - vRows.begin());
       }
@@ -131,21 +100,21 @@ int main(int argc, char* argv[]) {
 
     int centerRowIndex = (*vRowsIndex.begin() + *(vRowsIndex.end() - 1)) / 2;
 
-    /* vector<int> vCols;
-     dst.col(rows / 2).copyTo(vCols);
-     vector<int> vColsIndex;
-     for (auto it = vCols.begin(); it != vCols.end(); it++) {
-       if (*it == 255) vColsIndex.push_back(it - vCols.begin());
-     }*/
+    vector<int> vCols;
+    abs_grad_y.col(rows / 2).copyTo(vCols);
+    vector<int> vColsIndex;
+    for (auto it = vCols.begin(); it != vCols.end(); it++) {
+      if (*it ==255) vColsIndex.push_back(it - vCols.begin());
+    }
 
-    /*for (auto x : vColsIndex) cout << x << " ";
-    cout << endl;*/
-    // int centerColIndex = (*vColsIndex.begin() + *(vColsIndex.end() - 1)) / 2;
+    for (auto x : vColsIndex) cout << x << " ";
+    cout << endl;
+    int centerColIndex = (*vColsIndex.begin() + *(vColsIndex.end() - 1)) / 2;
 
     vector<double> centerlineGrayscale;
 
     // cout << src_16U.row(centerColIndex) << endl;
-    src_16U.row((rows / 2) - 1).copyTo(centerlineGrayscale);
+    src_16U.row(centerColIndex).copyTo(centerlineGrayscale);
 
     double maxElement = *std::max_element(centerlineGrayscale.begin(),
                                           centerlineGrayscale.end());
@@ -177,7 +146,6 @@ int main(int argc, char* argv[]) {
     cout << "the symmetry of this graph is: " << symmetry << endl;
 
     cv::imshow("16U", src_16U);
-    cv::imshow("sobel", dst);
 
     cv::waitKey();
     cv::destroyAllWindows();
@@ -187,4 +155,3 @@ int main(int argc, char* argv[]) {
   }
   return EXIT_SUCCESS;
 }
-#endif

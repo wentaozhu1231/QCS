@@ -1,11 +1,16 @@
-﻿  QCS.cpp
-E:\QcsProject\QCS\QCS.cpp(44,24): warning C4018: '<': signed/unsigned mismatch
-E:\QcsProject\QCS\QCS.cpp(47,26): warning C4018: '<': signed/unsigned mismatch
-E:\QcsProject\QCS\QCS.cpp(54,24): warning C4018: '<': signed/unsigned mismatch
-E:\QcsProject\QCS\QCS.cpp(124,33): warning C4244: 'argument': conversion from '__int64' to '_Ty', possible loss of data
+﻿  QCS2.cpp
+E:\QcsProject\QCS\QCS2.cpp(44,24): warning C4018: '<': signed/unsigned mismatch
+E:\QcsProject\QCS\QCS2.cpp(47,26): warning C4018: '<': signed/unsigned mismatch
+E:\QcsProject\QCS\QCS2.cpp(54,24): warning C4018: '<': signed/unsigned mismatch
+E:\QcsProject\QCS\QCS2.cpp(94,33): warning C4244: 'argument': conversion from '__int64' to '_Ty', possible loss of data
           with
           [
               _Ty=int
           ]
-E:\QcsProject\QCS\QCS.cpp(171,1): warning C4244: 'argument': conversion from 'double' to 'const unsigned __int64', possible loss of data
+E:\QcsProject\QCS\QCS2.cpp(107,46): warning C4244: 'argument': conversion from '__int64' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+E:\QcsProject\QCS\QCS2.cpp(141,1): warning C4244: 'argument': conversion from 'double' to 'const unsigned __int64', possible loss of data
   QCS.vcxproj -> E:\QcsProject\x64\Debug\QCS.exe

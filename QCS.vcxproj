@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="QCS.cpp" />
+    <ClCompile Include="QCS1.cpp" />
+    <ClCompile Include="QCS2.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
